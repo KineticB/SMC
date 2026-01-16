@@ -26,7 +26,7 @@
             color: var(--brand-choco);
             margin: 0;
             padding: 20px;
-            padding-bottom: 100px; /* 버튼 공간 확보 */
+            padding-bottom: 120px; /* 버튼 공간 확보 */
             line-height: 1.5;
         }
 
@@ -307,6 +307,7 @@
             width: 100%;
         }
 
+        /* 숨김 영역 (조건부 표시) */
         .hidden-area {
             display: none;
             background: #f9f9f9;
@@ -605,18 +606,9 @@
         <div class="step-section">
             <div class="step-header">Step 3. 손익 관련</div>
             <div class="step-content">
-                <div class="form-item">
-                    <label class="item-title">1. 손익 부진점 운영현황 및 활성화/절감 방안</label>
-                    <textarea name="s3_1_comment" placeholder="매출 활성화 방안 및 비용 절감 아이디어"></textarea>
-                </div>
-                <div class="form-item">
-                    <label class="item-title">2. 손익 분석 (영업이익 적자 원인)</label>
-                    <textarea name="s3_2_comment" placeholder="적자 사유 및 구체적 원인 파악"></textarea>
-                </div>
-                <div class="form-item">
-                    <label class="item-title">3. 자체 손익 (외부채널 제외) 개선 방안</label>
-                    <textarea name="s3_3_comment" placeholder="점포 자체 손익 개선 방안"></textarea>
-                </div>
+                <div class="form-item"><label class="item-title">1. 손익 부진점 운영현황 및 활성화/절감 방안</label><textarea name="s3_1_comment"></textarea></div>
+                <div class="form-item"><label class="item-title">2. 손익 분석 (영업이익 적자 원인)</label><textarea name="s3_2_comment"></textarea></div>
+                <div class="form-item"><label class="item-title">3. 자체 손익 (외부채널 제외) 개선 방안</label><textarea name="s3_3_comment"></textarea></div>
             </div>
         </div>
 
@@ -684,7 +676,7 @@
                     <textarea name="s5_2_comment" style="margin-top:10px;"></textarea>
                 </div>
                 <div class="form-item">
-                    <label class="item-title">3. 제조점 해섭(HACCP) 서류 확인</label>
+                   <label class="item-title">3. 제조점 해섭(HACCP) 서류 확인</label>
                     <div class="checkbox-wrapper"><input type="checkbox" id="haccp_check" name="haccp_yn"><label for="haccp_check">HACCP 관련 서류 비치 및 작성 확인 완료</label></div>
                     <textarea name="s5_3_comment"></textarea>
                 </div>
@@ -706,98 +698,59 @@
 </div>
 
 <script>
-    const scList = {
-        "중부1지점": ["정지성 SC", "강미옥 SC"], "중부2지점": ["장문근 SC", "이종현 SC"],
-        "서부지점": ["송정훈 SC", "강인구 SC"], "동부지점": ["성동연 SC", "채성우 SC"]
-    };
+    const scList = { "중부1지점": ["정지성 SC", "강미옥 SC"], "중부2지점": ["장문근 SC", "이종현 SC"], "서부지점": ["송정훈 SC", "강인구 SC"], "동부지점": ["성동연 SC", "채성우 SC"] };
     const webAppUrl = "https://script.google.com/macros/s/AKfycbxbHacOaFcNocI1UzCzdADxDWZN-OFWTMgYHCasJuDIW7Uqvq19khExNKK-JxndytqIww/exec";
 
-    // 과거 기록 팝업 (모달) 제어
     async function openHistory() {
         const storeName = document.getElementById('storeNameInput').value;
         const modal = document.getElementById('historyModal');
         const content = document.getElementById('modalContent');
-        
         if (!storeName) { alert("점포명을 먼저 입력해 주세요."); return; }
         modal.style.display = "flex";
         content.innerHTML = "<p style='text-align:center;'>기록 조회 중...</p>";
-
         try {
             const response = await fetch(`${webAppUrl}?store=${encodeURIComponent(storeName)}`);
             const data = await response.json();
-
             if (data && data.length > 0) {
-                const latest = data[data.length - 1]; // 가장 최근 데이터
-                content.innerHTML = `
-                    <div class="history-card">
-                        <b>📅 최근 점검일:</b> ${new Date(latest.date).toLocaleDateString()}<br>
-                        <b>지점/SC:</b> ${latest.branch} / ${latest.sc}<br>
-                        <b>메모:</b><br>${latest.memo || "기록 없음"}
-                    </div>
-                `;
+                const latest = data[data.length - 1];
+                const dateObj = new Date(latest.date);
+                content.innerHTML = `<div class="history-card"><b style="color:var(--brand-green); font-size:1.1em;">📅 최근 점검일: ${dateObj.toLocaleDateString()}</b><br><br><b>지점/SC:</b> ${latest.branch} / ${latest.sc}<br><b>점포유형:</b> ${latest.type || "-"}<br><div style="margin-top:12px; padding-top:10px; border-top:1px solid #ddd;"><b>핵심 메모:</b><br><p style="white-space:pre-wrap; margin-top:5px; line-height:1.4;">${latest.memo || "메모 없음"}</p></div></div>`;
             } else { content.innerHTML = "<p style='text-align:center;'>기록이 없습니다.</p>"; }
         } catch (e) { content.innerHTML = "<p style='text-align:center; color:red;'>조회 실패</p>"; }
     }
 
     function closeHistory() { document.getElementById('historyModal').style.display = "none"; }
 
-    // [기능 추가] 구글 스프레드 시트 데이터 센터 저장
     async function saveToDataCenter() {
         const form = document.getElementById('inspectionForm');
         const formData = new FormData(form);
-        
         const branch = formData.get('branch_name');
         const sc = formData.get('sc_name');
         const store = formData.get('inspection_store_name');
         const date = formData.get('inspection_date');
 
-        if (!branch || !sc || !store || !date) {
-            alert("지점명, 담당SC, 점포명, 점검일자를 모두 입력해야 데이터센터 저장이 가능합니다.");
-            return;
-        }
+        if (!branch || !sc || !store || !date) { alert("지점명, 담당SC, 점포명, 점검일자를 모두 입력해야 DB 저장이 가능합니다."); return; }
+        if(!confirm("구글 시트에 데이터를 저장하시겠습니까?")) return;
 
-        if(!confirm("현재 입력된 데이터를 데이터 센터(구글 시트)에 저장하시겠습니까?")) return;
-
-        const data = {
-            action: "save",
-            store: store,
-            date: date,
-            branch: branch,
-            sc: sc,
-            type: formData.get('store_type'),
-            memo: formData.get('s2_1_comment') // 예시로 매출 코멘트 저장
-        };
-
+        const data = { action: "save", store, date, branch, sc, type: formData.get('store_type'), memo: formData.get('s2_1_comment') };
         try {
-            await fetch(webAppUrl, {
-                method: "POST",
-                mode: "no-cors",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(data)
-            });
-            alert("데이터 센터 저장이 요청되었습니다. (시트를 확인하세요)");
-        } catch (e) { alert("저장 시 오류가 발생했습니다."); }
+            await fetch(webAppUrl, { method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
+            alert("저장 요청 완료");
+        } catch (e) { alert("저장 실패"); }
     }
 
     document.getElementById("branchSelect").addEventListener("change", function() {
         const scSelect = document.getElementById("scSelect");
-        scSelect.innerHTML = '<option value="">SC 선택</option>'; 
+        scSelect.innerHTML = '<option value="">SC 선택</option>'; 
         if (this.value && scList[this.value]) {
-            scList[this.value].forEach(sc => {
-                const opt = document.createElement("option"); opt.value = opt.textContent = sc; scSelect.appendChild(opt);
-            });
+            scList[this.value].forEach(sc => { const option = document.createElement("option"); option.value = sc; option.textContent = sc; scSelect.appendChild(option); });
         }
     });
 
-    document.getElementById("interview_check").addEventListener("change", function() {
-        document.getElementById("interview_area").style.display = this.checked ? "block" : "none";
-    });
+    document.getElementById("interview_check").addEventListener("change", function() { document.getElementById("interview_area").style.display = this.checked ? "block" : "none"; });
+    document.getElementById("storeTypeSelect").addEventListener("change", function() { document.getElementById("step5Section").style.display = (this.value === "영업점") ? "none" : "block"; });
 
-    document.getElementById("storeTypeSelect").addEventListener("change", function() {
-        document.getElementById("step5Section").style.display = (this.value === "영업점") ? "none" : "block";
-    });
-
-    function resetForm() { if(confirm("모든 내용을 초기화 하시겠습니까?")) { document.getElementById("inspectionForm").reset(); document.getElementById("interview_area").style.display = "none"; document.getElementById("step5Section").style.display = "block"; window.scrollTo(0,0); } }
+    function resetForm() { if(confirm("초기화 하시겠습니까?")) { document.getElementById("inspectionForm").reset(); document.getElementById("interview_area").style.display = "none"; document.getElementById("step5Section").style.display = "block"; window.scrollTo(0,0); } }
 
     async function getResizedImageData(file) {
         return new Promise((resolve) => {
@@ -818,7 +771,6 @@
         });
     }
 
-    // [기능 보강] 디자인 폼이 적용된 엑셀 생성
     async function generateExcelFile() {
         const form = document.getElementById('inspectionForm');
         const formData = new FormData(form);
@@ -831,27 +783,29 @@
         const workbook = new ExcelJS.Workbook();
         const sheet = workbook.addWorksheet('컨설팅리포트');
 
-        // 디자인 스타일 정의
         const headerStyle = { fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF00782B' } }, font: { color: { argb: 'FFFFFFFF' }, bold: true, size: 14 }, alignment: { horizontal: 'center', vertical: 'middle' } };
-        const labelStyle = { fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF0F7F2' } }, font: { bold: true, color: { argb: 'FF00782B' } }, border: { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } } };
+        const labelStyle = { fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF0F7F2' } }, font: { bold: true, color: { argb: 'FF00782B' } }, border: { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }, alignment: { vertical: 'middle', horizontal: 'center' } };
+        const contentStyle = { border: { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }, alignment: { vertical: 'middle', wrapText: true } };
 
-        sheet.columns = [{ width: 30 }, { width: 50 }, { width: 25 }];
+        sheet.columns = [{ width: 25 }, { width: 50 }, { width: 30 }];
 
         // 타이틀
         sheet.mergeCells('A1:C1');
         const title = sheet.getCell('A1');
         title.value = 'CONSULTING REPORT';
-        Object.assign(title, headerStyle);
+        title.style = headerStyle;
         sheet.getRow(1).height = 35;
 
         // 기본 정보
-        sheet.addRow(['점검일자', iDate, '']);
-        sheet.addRow(['점포명', storeName, '']);
-        sheet.addRow(['담당 SC', `${branch} / ${sc}`, '']);
-        [2, 3, 4].forEach(r => sheet.getRow(r).getCell(1).style = labelStyle);
+        const info = [['점검일자', iDate], ['점포명', storeName], ['담당 SC', `${branch} / ${sc}`]];
+        info.forEach((row, idx) => {
+            const r = sheet.addRow([row[0], row[1], '']);
+            r.getCell(1).style = labelStyle;
+            r.getCell(2).style = contentStyle;
+            r.getCell(3).style = contentStyle;
+        });
 
-        // 데이터 섹션 자동 추가 로직 (생략하지 않고 핵심 디자인 유지)
-        sheet.addRow([]);
+        // 데이터 섹션 함수
         const addSection = (title) => {
             const row = sheet.addRow([title]);
             sheet.mergeCells(`A${row.number}:C${row.number}`);
@@ -859,24 +813,51 @@
             row.height = 25;
         };
 
-        addSection('Step 1. 시설 및 환경 점검');
-        const rows = [
-            { l: '1. 점포 외관 점수', v: formData.get('s1_1_score') + '점', c: 'file_s1_1_cam', f: 'file_s1_1_file' },
-            { l: '매출 특이사항', v: formData.get('s2_1_comment') }
-        ];
+        const addData = async (label, value, camId, fileId) => {
+            const row = sheet.addRow([label, value || '-', '']);
+            row.getCell(1).style = labelStyle;
+            row.getCell(2).style = contentStyle;
+            row.getCell(3).style = contentStyle;
+            row.height = 90;
 
-        for (const dr of rows) {
-            const r = sheet.addRow([dr.l, dr.v || '-', '']);
-            r.getCell(1).style = labelStyle;
-            r.getCell(2).alignment = { wrapText: true, vertical: 'middle' };
-            r.height = 80;
-            
-            const file = (dr.c && document.getElementById(dr.c)?.files[0]) || (dr.f && document.getElementById(dr.f)?.files[0]);
+            const file = (camId && document.getElementById(camId)?.files[0]) || (fileId && document.getElementById(fileId)?.files[0]);
             if (file) {
                 const base64 = await getResizedImageData(file);
                 const imageId = workbook.addImage({ base64, extension: 'jpeg' });
-                sheet.addImage(imageId, { tl: { col: 2.1, row: r.number - 0.95 }, ext: { width: 150, height: 100 } });
+                sheet.addImage(imageId, { tl: { col: 2.1, row: row.number - 0.95 }, ext: { width: 180, height: 110 } });
             }
+        };
+
+        addSection('Step 1. 시설 및 환경 점검');
+        await addData('1. 점포 외관', formData.get('s1_1_score') + '점', 'file_s1_1_cam', 'file_s1_1_file');
+        await addData('2. 점포 내부', formData.get('s1_2_score') + '점', 'file_s1_2_cam', 'file_s1_2_file');
+        await addData('3. 고지물 점검', formData.get('s1_3_score') + '점', 'file_s1_3_cam', 'file_s1_3_file');
+        await addData('4. 기기 고장 점검', formData.get('s1_4_score') + '점', 'file_s1_4_cam', 'file_s1_4_file');
+
+        addSection('Step 2. 매출 관련');
+        await addData('1. 목표 및 실적', formData.get('s2_1_comment'));
+        await addData('2. 신제품 분석', `비율: ${formData.get('s2_2_ratio')}% / 증감: ${formData.get('s2_2_increase')}% \n내용: ${formData.get('s2_2_comment')}`);
+        await addData('3. 품절 및 발주', formData.get('s2_3_comment'));
+        await addData('4. 폐기 및 배달', `폐기: ${formData.get('s2_4_waste')}% / 시간: ${formData.get('s2_4_time')} \n내용: ${formData.get('s2_4_comment')}`);
+        await addData('5. 판촉 운영', formData.get('s2_5_comment'));
+
+        addSection('Step 3. 손익 관련');
+        await addData('1. 부진점 운영', formData.get('s3_1_comment'));
+        await addData('2. 손익 분석', formData.get('s3_2_comment'));
+        await addData('3. 개선 방안', formData.get('s3_3_comment'));
+
+        addSection('Step 4. 인사 및 기타');
+        await addData('1. 인력 운영', `연장근무: ${formData.get('s4_overtime')} \n내용: ${formData.get('s4_1_comment')}`);
+        await addData('2. 직원 면담', `면담: ${formData.get('s4_interview_yn') === 'on' ? '실시' : '미실시'} \n주6일발생: ${formData.get('s4_work6days')} \n내용: ${formData.get('s4_2_comment')}`, 'file_interview_cam', 'file_interview_file');
+        await addData('3. 업무 특이사항', formData.get('s4_3_special_comment'));
+        await addData('4. 지적사항 개선', `확인: ${formData.get('s4_improvement_yn') === 'on' ? '완료' : '미완료'} \n내용: ${formData.get('s4_4_improvement_comment')}`);
+
+        if (formData.get('store_type') !== "영업점") {
+            addSection('Step 5. 생산형 점포');
+            await addData('1. 수율 및 인건비', `믹스: ${formData.get('s5_yield_mix')}% / 6X: ${formData.get('s5_yield_6x')}% / 정백당: ${formData.get('s5_yield_sugar')}% / 인건비: ${formData.get('s5_labor_cost')}원 \n내용: ${formData.get('s5_1_comment')}`);
+            await addData('2. 기기 상태', formData.get('s5_2_comment'), 'file_s5_machine_cam', 'file_s5_machine_file');
+            await addData('3. HACCP 서류', `확인: ${formData.get('haccp_yn') === 'on' ? '완료' : '미완료'} \n내용: ${formData.get('s5_3_comment')}`);
+            await addData('4. 고충 및 건의', formData.get('s5_4_suggestion'));
         }
 
         const buffer = await workbook.xlsx.writeBuffer();
@@ -891,7 +872,7 @@
         if(!branch || !sc) { alert("지점과 SC를 먼저 선택해 주세요."); return; }
         const { blob, fileName } = await generateExcelFile(); saveAs(blob, `${fileName}.xlsx`);
         const subject = `[제출] ${fileName}`;
-        window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=리포트 첨부파일 확인 바랍니다.`;
+        window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=첨부파일 확인 바랍니다.`;
     }
 </script>
 
