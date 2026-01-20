@@ -7,6 +7,8 @@
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/suneditor@latest/dist/css/suneditor.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/suneditor@latest/dist/suneditor.min.js"></script>
 
     <style>
         /* 폰트 및 컬러 변수 정의 */
@@ -149,6 +151,45 @@
             background-size: 16px;
         }
 
+        /* 입체적 디자인 테이블 스타일 (2-1, 2-4, 4-1 적용) */
+        .data-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-bottom: 15px;
+            font-size: 0.85em;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1); /* 입체적 그림자 */
+            border: 1px solid var(--brand-green);
+        }
+        .data-table th { 
+            background: linear-gradient(180deg, var(--brand-green) 0%, #005a20 100%); /* 입체적 그라데이션 */
+            color: var(--white); 
+            padding: 12px 5px;
+            font-weight: 600;
+            text-shadow: 1px 1px 1px rgba(0,0,0,0.2);
+            border: none;
+        }
+        .data-table td {
+            border-bottom: 1px solid #edf2f0;
+            border-right: 1px solid #edf2f0;
+            padding: 10px 5px;
+            text-align: center;
+            background-color: #fff;
+        }
+        .data-table td:last-child { border-right: none; }
+        .data-table tr:last-child td { border-bottom: none; }
+        .data-table input { 
+            border: 1px solid #e2e8e4 !important; 
+            width: 90%; 
+            text-align: right; 
+            background: #fdfdfd; 
+            padding: 5px !important;
+            border-radius: 4px;
+        }
+        .bg-gray { background-color: #f9fbf9 !important; font-weight: bold; color: var(--brand-green); }
+
         /* 공통 라디오/체크박스 래퍼 스타일 */
         .option-wrapper {
             display: flex;
@@ -277,7 +318,7 @@
         }
         .file-input-item input[type="file"] {
             width: 100%;
-            font-size: 11px; /* 모바일에서 텍스트가 안 깨지도록 작게 조절 */
+            font-size: 11px; 
         }
 
         /* 체크박스 디자인 */
@@ -350,9 +391,8 @@
         .btn-save { background-color: var(--brand-choco); }
         .btn-email { background-color: var(--brand-blue); }
         .btn-history { background-color: var(--brand-green); }
-        .btn-cloud { background-color: #f39c12; } /* 주황색 클라우드 버튼 */
+        .btn-cloud { background-color: #f39c12; } 
 
-        /* 과거 기록 모달 팝업 추가 */
         #historyModal {
             display: none;
             position: fixed;
@@ -386,7 +426,7 @@
             .input-group-row { flex-direction: column; gap: 10px; }
             .rating-wrapper { padding: 8px; }
             .rating-item { font-size: 0.75em; }
-            .file-input-group { gap: 5px; } /* 간격 좁힘 */
+            .file-input-group { gap: 5px; } 
             .file-input-item { padding: 4px; }
             .btn-group { bottom: 10px; right: 10px; gap: 8px; }
             .icon-btn { width: 45px; height: 45px; font-size: 16px; }
@@ -434,6 +474,7 @@
                             <option value="제조출고점">제조출고점</option>
                             <option value="제조영업점">제조영업점</option>
                             <option value="영업점">영업점</option>
+                            <option value="외부활동(미점검)">외부활동(미점검)</option>
                         </select>
                     </div>
                 </div>
@@ -455,234 +496,307 @@
                         </select>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <div class="step-section">
-            <div class="step-header">Step 1. 점검 시작 전 (시설/환경)</div>
-            <div class="step-content">
-                <p class="sub-desc" style="display:block; background:#fff3cd; color:#856404; border:1px solid #ffeeba;">※ 1점(나쁨) ~ 5점(좋음) 평가 및 불량 시 사진 등록</p>
-                
-                <div class="form-item">
-                    <label class="item-title" id="title_s1_1">1. 점포 외관 (노후상태)</label>
-                    <div class="rating-wrapper">
-                        <label class="rating-item"><input type="radio" name="s1_1_score" value="1">1점</label>
-                        <label class="rating-item"><input type="radio" name="s1_1_score" value="2">2점</label>
-                        <label class="rating-item"><input type="radio" name="s1_1_score" value="3">3점</label>
-                        <label class="rating-item"><input type="radio" name="s1_1_score" value="4">4점</label>
-                        <label class="rating-item"><input type="radio" name="s1_1_score" value="5">5점</label>
-                    </div>
-                    <div class="file-upload-box">
-                        <div class="file-input-group">
-                            <div class="file-input-item"><span>카메라 실행:</span><input type="file" name="file_s1_1_cam" id="file_s1_1_cam" accept="image/*" capture="camera"></div>
-                            <div class="file-input-item"><span>파일 선택:</span><input type="file" name="file_s1_1_file" id="file_s1_1_file" accept="image/*"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-item">
-                    <label class="item-title" id="title_s1_2">2. 점포 내부 (정리상태)</label>
-                    <div class="rating-wrapper">
-                        <label class="rating-item"><input type="radio" name="s1_2_score" value="1">1점</label>
-                        <label class="rating-item"><input type="radio" name="s1_2_score" value="2">2점</label>
-                        <label class="rating-item"><input type="radio" name="s1_2_score" value="3">3점</label>
-                        <label class="rating-item"><input type="radio" name="s1_2_score" value="4">4점</label>
-                        <label class="rating-item"><input type="radio" name="s1_2_score" value="5">5점</label>
-                    </div>
-                    <div class="file-upload-box">
-                        <div class="file-input-group">
-                            <div class="file-input-item"><span>카메라 실행:</span><input type="file" name="file_s1_2_cam" id="file_s1_2_cam" accept="image/*" capture="camera"></div>
-                            <div class="file-input-item"><span>파일 선택:</span><input type="file" name="file_s1_2_file" id="file_s1_2_file" accept="image/*"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-item">
-                    <label class="item-title" id="title_s1_3">3. 고지물 점검 (노후/불필요 제거)</label>
-                    <div class="rating-wrapper">
-                        <label class="rating-item"><input type="radio" name="s1_3_score" value="1">1점</label>
-                        <label class="rating-item"><input type="radio" name="s1_3_score" value="2">2점</label>
-                        <label class="rating-item"><input type="radio" name="s1_3_score" value="3">3점</label>
-                        <label class="rating-item"><input type="radio" name="s1_3_score" value="4">4점</label>
-                        <label class="rating-item"><input type="radio" name="s1_3_score" value="5">5점</label>
-                    </div>
-                    <div class="file-upload-box">
-                        <div class="file-input-group">
-                            <div class="file-input-item"><span>카메라 실행:</span><input type="file" name="file_s1_3_cam" id="file_s1_3_cam" accept="image/*" capture="camera"></div>
-                            <div class="file-input-item"><span>파일 선택:</span><input type="file" name="file_s1_3_file" id="file_s1_3_file" accept="image/*"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-item">
-                    <label class="item-title" id="title_s1_4">4. 기기 고장 및 교체 필요 사항</label>
-                    <div class="rating-wrapper">
-                        <label class="rating-item"><input type="radio" name="s1_4_score" value="1">1점</label>
-                        <label class="rating-item"><input type="radio" name="s1_4_score" value="2">2점</label>
-                        <label class="rating-item"><input type="radio" name="s1_4_score" value="3">3점</label>
-                        <label class="rating-item"><input type="radio" name="s1_4_score" value="4">4점</label>
-                        <label class="rating-item"><input type="radio" name="s1_4_score" value="5">5점</label>
-                    </div>
-                    <div class="file-upload-box">
-                        <div class="file-input-group">
-                            <div class="file-input-item"><span>카메라 실행:</span><input type="file" name="file_s1_4_cam" id="file_s1_4_cam" accept="image/*" capture="camera"></div>
-                            <div class="file-input-item"><span>파일 선택:</span><input type="file" name="file_s1_4_file" id="file_s1_4_file" accept="image/*"></div>
-                        </div>
-                    </div>
+                <div id="outsideArea" class="hidden-area" style="border: 2px solid var(--brand-red); margin-top:20px;">
+                    <label class="item-title" style="color:var(--brand-red)">Out Step. 점포 컨설팅 미진행으로 인한 SC 업무간 특이사항 작성(상세)</label>
+                    <div id="outsideEditor"></div>
+                    <input type="hidden" name="outside_comment_html" id="outsideCommentHtml">
                 </div>
             </div>
         </div>
 
-        <div class="step-section">
-            <div class="step-header">Step 2. 매출 관련</div>
-            <div class="step-content">
-                
-                <div class="form-item">
-                    <label class="item-title">1. 목표매출 및 실적 점검</label>
-                    <div class="sub-desc">외부채널 제외 후 실적 및 시간대 매출 점검</div>
-                    <textarea name="s2_1_comment" placeholder="특이사항 및 분석 내용 입력"></textarea>
-                </div>
-
-                <div class="form-item">
-                    <label class="item-title">2. 신제품 판매 실적 분석</label>
-                    <div class="input-group-row">
-                        <div class="input-box">
-                            <label>🍩 신제품 비율</label>
-                            <div class="input-with-unit">
-                                <input type="number" name="s2_2_ratio" placeholder="0"><span>%</span>
-                            </div>
-                        </div>
-                        <div class="input-box">
-                            <label>📈 상권별 신제품 대비 증감율</label>
-                            <div class="input-with-unit">
-                                <input type="number" name="s2_2_increase" placeholder="0"><span>%</span>
-                            </div>
-                        </div>
-                    </div>
-                    <textarea name="s2_2_comment" placeholder="증감 원인 및 상세 분석"></textarea>
-                </div>
-
-                <div class="form-item">
-                    <label class="item-title">3. 제품 품절시간 및 발주량 점검</label>
-                    <textarea name="s2_3_comment" placeholder="발주 적정성 및 품절 관련 코멘트"></textarea>
-                </div>
-
-                <div class="form-item">
-                    <label class="item-title">4. 도넛 폐기 실적 및 배달 실적 점검</label>
-                    <div class="input-group-row">
-                        <div class="input-box">
-                            <label>🗑️ 폐기율</label>
-                            <div class="input-with-unit">
-                                <input type="number" name="s2_4_waste" step="0.1" placeholder="0"><span>%</span>
-                            </div>
-                        </div>
-                        <div class="input-box">
-                            <label>🛵 평균 배달 품절시간</label>
-                            <select name="s2_4_time">
-                                <option value="">시간 선택</option>
-                                <option value="13:00">13:00</option>
-                                <option value="14:00">14:00</option>
-                                <option value="15:00">15:00</option>
-                                <option value="16:00">16:00</option>
-                                <option value="17:00">17:00</option>
-                                <option value="18:00">18:00</option>
-                                <option value="19:00">19:00</option>
-                                <option value="20:00">20:00</option>
-                                <option value="21:00">21:00</option>
-                            </select>
-                        </div>
-                    </div>
-                    <textarea name="s2_4_comment" placeholder="폐기 및 배달 관련 상세 코멘트"></textarea>
-                </div>
-
-                <div class="form-item">
-                    <label class="item-title">5. 판촉 운영 (점포판촉 / CRM / 외부채널)</label>
-                    <textarea name="s2_5_comment" placeholder="판촉 성과 및 향후 운영 계획"></textarea>
-                </div>
-
-            </div>
-        </div>
-
-        <div class="step-section">
-            <div class="step-header">Step 3. 손익 관련</div>
-            <div class="step-content">
-                <div class="form-item"><label class="item-title">1. 손익 부진점 운영현황 및 활성화/절감 방안</label><textarea name="s3_1_comment"></textarea></div>
-                <div class="form-item"><label class="item-title">2. 손익 분석 (영업이익 적자 원인)</label><textarea name="s3_2_comment"></textarea></div>
-                <div class="form-item"><label class="item-title">3. 자체 손익 (외부채널 제외) 개선 방안</label><textarea name="s3_3_comment"></textarea></div>
-            </div>
-        </div>
-
-        <div class="step-section">
-            <div class="step-header">Step 4. 인사 및 기타 점검</div>
-            <div class="step-content">
-                <div class="form-item">
-                    <label class="item-title">1. 인력 운영 적정성 (52시간, 인건비 등)</label>
-                    <div class="option-wrapper">
-                        <label class="radio-label"><input type="radio" name="s4_overtime" value="예"> 예</label>
-                        <label class="radio-label"><input type="radio" name="s4_overtime" value="아니오"> 아니오</label>
-                    </div>
-                    <textarea name="s4_1_comment"></textarea>
-                </div>
-                <div class="form-item">
-                    <label class="item-title">2. 직원 면담 및 SHIFT 점검</label>
-                    <div class="checkbox-wrapper"><input type="checkbox" id="interview_check" name="s4_interview_yn"><label for="interview_check">직원 면담 진행 여부</label></div>
-                    <div id="interview_area" class="hidden-area">
-                        <div class="input-group-row">
-                            <div class="input-box"><label>점포명</label><input type="text" name="interview_store"></div>
-                            <div class="input-box"><label>이름</label><input type="text" name="interview_name"></div>
-                            <div class="input-box"><label>직책</label><input type="text" name="interview_position"></div>
+        <div id="mainSteps">
+            <div class="step-section">
+                <div class="step-header">Step 1. 점검 시작 전 (시설/환경)</div>
+                <div class="step-content">
+                    <p class="sub-desc" style="display:block; background:#fff3cd; color:#856404; border:1px solid #ffeeba;">※ 1점(나쁨) ~ 5점(좋음) 평가 및 불량 시 사진 등록</p>
+                    
+                    <div class="form-item">
+                        <label class="item-title" id="title_s1_1">1. 점포 외관 (노후상태)</label>
+                        <div class="rating-wrapper">
+                            <label class="rating-item"><input type="radio" name="s1_1_score" value="1">1점</label>
+                            <label class="rating-item"><input type="radio" name="s1_1_score" value="2">2점</label>
+                            <label class="rating-item"><input type="radio" name="s1_1_score" value="3">3점</label>
+                            <label class="rating-item"><input type="radio" name="s1_1_score" value="4">4점</label>
+                            <label class="rating-item"><input type="radio" name="s1_1_score" value="5">5점</label>
                         </div>
                         <div class="file-upload-box">
                             <div class="file-input-group">
-                                <div class="file-input-item"><span>카메라 실행:</span><input type="file" name="file_interview_cam" id="file_interview_cam" accept="image/*" capture="camera"></div>
-                                <div class="file-input-item"><span>파일 선택:</span><input type="file" name="file_interview_file" id="file_interview_file" accept="image/*"></div>
+                                <div class="file-input-item"><span>카메라 실행:</span><input type="file" name="file_s1_1_cam" id="file_s1_1_cam" accept="image/*" capture="camera"></div>
+                                <div class="file-input-item"><span>파일 선택:</span><input type="file" name="file_s1_1_file" id="file_s1_1_file" accept="image/*"></div>
                             </div>
                         </div>
                     </div>
-                    <textarea name="s4_2_comment" style="margin-top:15px;"></textarea>
-                </div>
-                <div class="form-item"><label class="item-title">3. 직영,가맹 업무간 특이사항 작성</label><textarea name="s4_3_special_comment"></textarea></div>
-                <div class="form-item">
-                    <label class="item-title">4. Store통합관리팀 점검 지적사항 관련</label>
-                    <div class="checkbox-wrapper"><input type="checkbox" id="improvement_check" name="s4_improvement_yn"><label for="improvement_check">지적사항 개선 확인 여부</label></div>
-                    <textarea name="s4_4_improvement_comment"></textarea>
-                </div>
-            </div>
-        </div>
 
-        <div id="step5Section" class="step-section">
-            <div class="step-header">Step 5. 생산형 점포 수율 및 개당 인건비 확인</div>
-            <div class="step-content">
-                <div class="form-item">
-                    <label class="item-title">1. 생산형 점포 수율 및 개당 인건비</label>
-                    <div class="input-group-row">
-                        <div class="input-box"><label>🥣 믹스 수율</label><div class="input-with-unit"><input type="number" name="s5_yield_mix"><span>%</span></div></div>
-                        <div class="input-box"><label>🍩 6X 수율</label><div class="input-with-unit"><input type="number" name="s5_yield_6x"><span>%</span></div></div>
-                    </div>
-                    <div class="input-group-row">
-                        <div class="input-box"><label>🍬 정백당 수율</label><div class="input-with-unit"><input type="number" name="s5_yield_sugar"><span>%</span></div></div>
-                        <div class="input-box"><label>💰 개당 인건비</label><div class="input-with-unit"><input type="number" name="s5_labor_cost"><span>원</span></div></div>
-                    </div>
-                    <textarea name="s5_1_comment"></textarea>
-                </div>
-                <div class="form-item">
-                    <label class="item-title">2. 제조출고 영업점 기기 상태 및 수리 확인</label>
-                    <div class="file-upload-box">
-                        <div class="file-input-group">
-                            <div class="file-input-item"><span>카메라 실행:</span><input type="file" name="file_s5_machine_cam" id="file_s5_machine_cam" accept="image/*" capture="camera"></div>
-                            <div class="file-input-item"><span>파일 선택:</span><input type="file" name="file_s5_machine_file" id="file_s5_machine_file" accept="image/*"></div>
+                    <div class="form-item">
+                        <label class="item-title" id="title_s1_2">2. 점포 내부 (정리상태)</label>
+                        <div class="rating-wrapper">
+                            <label class="rating-item"><input type="radio" name="s1_2_score" value="1">1점</label>
+                            <label class="rating-item"><input type="radio" name="s1_2_score" value="2">2점</label>
+                            <label class="rating-item"><input type="radio" name="s1_2_score" value="3">3점</label>
+                            <label class="rating-item"><input type="radio" name="s1_2_score" value="4">4점</label>
+                            <label class="rating-item"><input type="radio" name="s1_2_score" value="5">5점</label>
+                        </div>
+                        <div class="file-upload-box">
+                            <div class="file-input-group">
+                                <div class="file-input-item"><span>카메라 실행:</span><input type="file" name="file_s1_2_cam" id="file_s1_2_cam" accept="image/*" capture="camera"></div>
+                                <div class="file-input-item"><span>파일 선택:</span><input type="file" name="file_s1_2_file" id="file_s1_2_file" accept="image/*"></div>
+                            </div>
                         </div>
                     </div>
-                    <textarea name="s5_2_comment" style="margin-top:10px;"></textarea>
+
+                    <div class="form-item">
+                        <label class="item-title" id="title_s1_3">3. 고지물 점검 (노후/제거/추가제작필요)</label>
+                        <div class="rating-wrapper">
+                            <label class="rating-item"><input type="radio" name="s1_3_score" value="1">1점</label>
+                            <label class="rating-item"><input type="radio" name="s1_3_score" value="2">2점</label>
+                            <label class="rating-item"><input type="radio" name="s1_3_score" value="3">3점</label>
+                            <label class="rating-item"><input type="radio" name="s1_3_score" value="4">4점</label>
+                            <label class="rating-item"><input type="radio" name="s1_3_score" value="5">5점</label>
+                        </div>
+                        <textarea name="s1_3_add_comment" placeholder="고지물 추가제작 관련 내용 입력"></textarea>
+                        <div class="file-upload-box">
+                            <div class="file-input-group">
+                                <div class="file-input-item"><span>카메라 실행:</span><input type="file" name="file_s1_3_cam" id="file_s1_3_cam" accept="image/*" capture="camera"></div>
+                                <div class="file-input-item"><span>파일 선택:</span><input type="file" name="file_s1_3_file" id="file_s1_3_file" accept="image/*"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-item">
+                        <label class="item-title" id="title_s1_4">4. 기기 고장 및 교체 필요 사항</label>
+                        <div class="rating-wrapper">
+                            <label class="rating-item"><input type="radio" name="s1_4_score" value="1">1점</label>
+                            <label class="rating-item"><input type="radio" name="s1_4_score" value="2">2점</label>
+                            <label class="rating-item"><input type="radio" name="s1_4_score" value="3">3점</label>
+                            <label class="rating-item"><input type="radio" name="s1_4_score" value="4">4점</label>
+                            <label class="rating-item"><input type="radio" name="s1_4_score" value="5">5점</label>
+                        </div>
+                        <div class="file-upload-box">
+                            <div class="file-input-group">
+                                <div class="file-input-item"><span>카메라 실행:</span><input type="file" name="file_s1_4_cam" id="file_s1_4_cam" accept="image/*" capture="camera"></div>
+                                <div class="file-input-item"><span>파일 선택:</span><input type="file" name="file_s1_4_file" id="file_s1_4_file" accept="image/*"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-item">
+                        <label class="item-title" id="title_s1_6">5. 점포상권 변화확인</label>
+                        <textarea name="s1_6_comment" placeholder="200M 내외 상권파악"></textarea>
+                    </div>
                 </div>
-                <div class="form-item">
-                   <label class="item-title">3. 제조점 해섭(HACCP) 서류 확인</label>
-                    <div class="checkbox-wrapper"><input type="checkbox" id="haccp_check" name="haccp_yn"><label for="haccp_check">HACCP 관련 서류 비치 및 작성 확인 완료</label></div>
-                    <textarea name="s5_3_comment"></textarea>
+            </div>
+
+            <div class="step-section">
+                <div class="step-header">Step 2. 매출 관련</div>
+                <div class="step-content">
+                    
+                    <div class="form-item">
+                        <label class="item-title">1. 매출 실적 분석 (단위: 천원)</label>
+                        <table class="data-table" id="salesTable">
+                            <thead>
+                                <tr><th>구분(천원)</th><th>매출</th><th>외부채널</th><th>배달</th><th>단체</th><th>순수래점</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>전년</td>
+                                    <td><input type="number" name="s2_1_last_total" oninput="calcS2_1()"></td>
+                                    <td><input type="number" name="s2_1_last_ext" oninput="calcS2_1()"></td>
+                                    <td><input type="number" name="s2_1_last_del"></td>
+                                    <td><input type="number" name="s2_1_last_grp"></td>
+                                    <td class="bg-gray" id="s2_1_last_pure">0</td>
+                                </tr>
+                                <tr>
+                                    <td>금년</td>
+                                    <td><input type="number" name="s2_1_curr_total" oninput="calcS2_1()"></td>
+                                    <td><input type="number" name="s2_1_curr_ext" oninput="calcS2_1()"></td>
+                                    <td><input type="number" name="s2_1_curr_del"></td>
+                                    <td><input type="number" name="s2_1_curr_grp"></td>
+                                    <td class="bg-gray" id="s2_1_curr_pure">0</td>
+                                </tr>
+                                <tr class="bg-gray">
+                                    <td>증감(%)</td>
+                                    <td id="s2_1_diff_total">0(0%)</td>
+                                    <td colspan="4" style="text-align:right; padding-right:20px;">순수래점 증감: <span id="s2_1_diff_pure">0(0%)</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <textarea name="s2_1_comment" placeholder="특이사항 및 분석 내용 입력"></textarea>
+                    </div>
+
+                    <div class="form-item">
+                        <label class="item-title">2. 블럭별 매출 분석</label>
+                        <select id="blockSelector" style="margin-bottom:10px;">
+                            <option value="">분석 블럭 선택</option>
+                            <option value="더즌">더즌</option>
+                            <option value="싱글">싱글</option>
+                            <option value="세트">세트</option>
+                            <option value="에스프레소">에스프레소</option>
+                            <option value="프로즌">프로즌</option>
+                            <option value="기타">기타</option>
+                        </select>
+                        <div id="blockTableContainer"></div>
+                        <textarea name="s2_2_comment" placeholder="증감 원인 및 상세 분석"></textarea>
+                    </div>
+
+                    <div class="form-item">
+                        <label class="item-title">3. 도넛 품절, 폐기 및 배달실적</label>
+                        <div class="sub-desc">평균 품절 시간 및 실적 점검</div>
+                        <table class="data-table">
+                            <tr>
+                                <th>OG 품절</th>
+                                <td>
+                                    <select name="s2_3_og_time">
+                                        <option value="미발생">미발생</option>
+                                        <script>for(let i=12; i<=21; i++) document.write(`<option value="${i}:00">${i}:00</option>`);</script>
+                                    </select>
+                                </td>
+                                <th>어쏘티드 품절</th>
+                                <td>
+                                    <select name="s2_3_as_time">
+                                        <option value="미발생">미발생</option>
+                                        <script>for(let i=12; i<=21; i++) document.write(`<option value="${i}:00">${i}:00</option>`);</script>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>배달 품절시간</th>
+                                <td>
+                                    <select name="s2_3_del_time">
+                                        <option value="미발생">미발생</option>
+                                        <script>for(let i=12; i<=21; i++) document.write(`<option value="${i}:00">${i}:00</option>`);</script>
+                                    </select>
+                                </td>
+                                <th>폐기율(%)</th>
+                                <td><input type="number" name="s2_3_waste_rate" step="0.1"></td>
+                            </tr>
+                        </table>
+                        <textarea name="s2_3_comment" placeholder="발주 적정성 및 품절 관련 코멘트"></textarea>
+                    </div>
+
+                    <div class="form-item">
+                        <label class="item-title">4. 판촉 운영 (점포판촉 / CRM / 외부채널)</label>
+                        <table class="data-table">
+                            <thead><tr><th>판촉명</th><th>추가매출</th><th>매출구성비(%)</th></tr></thead>
+                            <tbody>
+                                <tr><td><input type="text" name="s2_4_promo1"></td><td><input type="number" name="s2_4_val1"></td><td><input type="number" name="s2_4_per1"></td></tr>
+                                <tr><td><input type="text" name="s2_4_promo2"></td><td><input type="number" name="s2_4_val2"></td><td><input type="number" name="s2_4_per2"></td></tr>
+                            </tbody>
+                        </table>
+                        <textarea name="s2_4_comment" placeholder="판촉 성과 및 향후 운영 계획"></textarea>
+                    </div>
+
+                    <div class="form-item">
+                        <label class="item-title">5. 단체주문(CR 활동)</label>
+                        <textarea name="s2_5_comment" placeholder="단체고객 리스트 - DM발송 및 분기별 관리"></textarea>
+                    </div>
                 </div>
-                <div class="form-item">
-                    <label class="item-title">4. 제조출고,영업점 고충 및 건의사항(생산, 기기, 출고, 프로세싱 등등)</label>
-                    <textarea name="s5_4_suggestion"></textarea>
+            </div>
+
+            <div class="step-section">
+                <div class="step-header">Step 3. 손익 관련</div>
+                <div class="step-content">
+                    <div class="form-item">
+                        <label class="item-title">1. 계정과목별 분석 (최근 확인된 점포 손익계산서 기준)</label>
+                        <div id="accountTableContainer"></div>
+                        <button type="button" onclick="addAccountTable()" style="padding: 10px; background: var(--brand-blue); color: white; border: none; border-radius: 5px; cursor: pointer; margin-bottom: 15px;">+ 계정과목 선택하여 추가</button>
+                        <textarea name="s3_1_comment" placeholder="손익 부진점 운영현황 및 활성화/절감 방안"></textarea>
+                    </div>
+                    <div class="form-item"><label class="item-title">2. 손익 분석 (영업이익 적자 원인)</label><textarea name="s3_2_comment"></textarea></div>
+                    <div class="form-item"><label class="item-title">3. 자체 손익 (외부채널 제외) 개선 방안</label><textarea name="s3_3_comment"></textarea></div>
+                </div>
+            </div>
+
+            <div class="step-section">
+                <div class="step-header">Step 4. 인사 및 기타 점검</div>
+                <div class="step-content">
+                    <div class="form-item">
+                        <label class="item-title">1. 인력 운영 적정성 (52시간, 인건비 등)</label>
+                        <table class="data-table">
+                            <thead>
+                                <tr><th>구분</th><th>메이트 인건비(천원)</th><th>사용시간</th><th>내용(증감율)</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>전년</td>
+                                    <td><input type="number" name="s4_1_last_cost" oninput="calcS4_1()"></td>
+                                    <td><input type="number" name="s4_1_last_time"></td>
+                                    <td rowspan="2" id="s4_1_res" class="bg-gray">0%</td>
+                                </tr>
+                                <tr>
+                                    <td>금년</td>
+                                    <td><input type="number" name="s4_1_curr_cost" oninput="calcS4_1()"></td>
+                                    <td><input type="number" name="s4_1_curr_time"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="option-wrapper">
+                            <label class="radio-label"><input type="radio" name="s4_overtime" value="예"> 예</label>
+                            <label class="radio-label"><input type="radio" name="s4_overtime" value="아니오"> 아니오</label>
+                        </div>
+                        <textarea name="s4_1_comment" placeholder="인건비 분석 및 운영 적정성 코멘트"></textarea>
+                    </div>
+                    <div class="form-item">
+                        <label class="item-title">2. 직원 면담 및 SHIFT 점검</label>
+                        <div class="checkbox-wrapper"><input type="checkbox" id="interview_check" name="s4_interview_yn"><label for="interview_check">직원 면담 진행 여부</label></div>
+                        <div id="interview_area" class="hidden-area">
+                            <div class="input-group-row">
+                                <div class="input-box"><label>점포명</label><input type="text" name="interview_store"></div>
+                                <div class="input-box"><label>이름</label><input type="text" name="interview_name"></div>
+                                <div class="input-box"><label>직책</label><input type="text" name="interview_position"></div>
+                            </div>
+                            <div class="file-upload-box">
+                                <div class="file-input-group">
+                                    <div class="file-input-item"><span>카메라 실행:</span><input type="file" name="file_interview_cam" id="file_interview_cam" accept="image/*" capture="camera"></div>
+                                    <div class="file-input-item"><span>파일 선택:</span><input type="file" name="file_interview_file" id="file_interview_file" accept="image/*"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <textarea name="s4_2_comment" style="margin-top:15px;"></textarea>
+                    </div>
+                    <div class="form-item"><label class="item-title">3. 직영,가맹 업무간 특이사항 작성</label><textarea name="s4_3_special_comment"></textarea></div>
+                    <div class="form-item">
+                        <label class="item-title">4. Store통합관리팀 점검 지적사항 관련</label>
+                        <div class="checkbox-wrapper"><input type="checkbox" id="improvement_check" name="s4_improvement_yn"><label for="improvement_check">지적사항 개선 확인 여부</label></div>
+                        <textarea name="s4_4_improvement_comment"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div id="step5Section" class="step-section">
+                <div class="step-header">Step 5. 생산형 점포 수율 및 개당 인건비 확인</div>
+                <div class="step-content">
+                    <div class="form-item">
+                        <label class="item-title">1. 생산형 점포 수율 및 개당 인건비</label>
+                        <div class="input-group-row">
+                            <div class="input-box"><label>🥣 믹스 수율</label><div class="input-with-unit"><input type="number" name="s5_yield_mix"><span>%</span></div></div>
+                            <div class="input-box"><label>🍩 6X 수율</label><div class="input-with-unit"><input type="number" name="s5_yield_6x"><span>%</span></div></div>
+                        </div>
+                        <div class="input-group-row">
+                            <div class="input-box"><label>🍬 정백당 수율</label><div class="input-with-unit"><input type="number" name="s5_yield_sugar"><span>%</span></div></div>
+                            <div class="input-box"><label>💰 개당 인건비</label><div class="input-with-unit"><input type="number" name="s5_labor_cost"><span>원</span></div></div>
+                        </div>
+                        <textarea name="s5_1_comment"></textarea>
+                    </div>
+                    <div class="form-item">
+                        <label class="item-title">2. 제조출고 영업점 기기 상태 및 수리 확인</label>
+                        <div class="file-upload-box">
+                            <div class="file-input-group">
+                                <div class="file-input-item"><span>카메라 실행:</span><input type="file" name="file_s5_machine_cam" id="file_s5_machine_cam" accept="image/*" capture="camera"></div>
+                                <div class="file-input-item"><span>파일 선택:</span><input type="file" name="file_s5_machine_file" id="file_s5_machine_file" accept="image/*"></div>
+                            </div>
+                        </div>
+                        <textarea name="s5_2_comment" style="margin-top:10px;"></textarea>
+                    </div>
+                    <div class="form-item">
+                       <label class="item-title">3. 제조점 해섭(HACCP) 서류 확인</label>
+                        <div class="checkbox-wrapper"><input type="checkbox" id="haccp_check" name="haccp_yn"><label for="haccp_check">HACCP 관련 서류 비치 및 작성 확인 완료</label></div>
+                        <textarea name="s5_3_comment"></textarea>
+                    </div>
+                    <div class="form-item">
+                        <label class="item-title">4. 제조출고,영업점 고충 및 건의사항</label>
+                        <textarea name="s5_4_suggestion"></textarea>
+                    </div>
                 </div>
             </div>
         </div>
@@ -699,181 +813,276 @@
 
 <script>
     const scList = { "중부1지점": ["정지성 SC", "강미옥 SC"], "중부2지점": ["장문근 SC", "이종현 SC"], "서부지점": ["송정훈 SC", "강인구 SC"], "동부지점": ["성동연 SC", "채성우 SC"] };
-    const webAppUrl = "https://script.google.com/macros/s/AKfycbxbHacOaFcNocI1UzCzdADxDWZN-OFWTMgYHCasJuDIW7Uqvq19khExNKK-JxndytqIww/exec";
+    let editorInstance;
 
-    async function openHistory() {
-        const storeName = document.getElementById('storeNameInput').value;
-        const modal = document.getElementById('historyModal');
-        const content = document.getElementById('modalContent');
-        if (!storeName) { alert("점포명을 먼저 입력해 주세요."); return; }
-        modal.style.display = "flex";
-        content.innerHTML = "<p style='text-align:center;'>기록 조회 중...</p>";
-        try {
-            const response = await fetch(`${webAppUrl}?store=${encodeURIComponent(storeName)}`);
-            const data = await response.json();
-            if (data && data.length > 0) {
-                const latest = data[data.length - 1];
-                const dateObj = new Date(latest.date);
-                content.innerHTML = `<div class="history-card"><b style="color:var(--brand-green); font-size:1.1em;">📅 최근 점검일: ${dateObj.toLocaleDateString()}</b><br><br><b>지점/SC:</b> ${latest.branch} / ${latest.sc}<br><b>점포유형:</b> ${latest.type || "-"}<br><div style="margin-top:12px; padding-top:10px; border-top:1px solid #ddd;"><b>핵심 메모:</b><br><p style="white-space:pre-wrap; margin-top:5px; line-height:1.4;">${latest.memo || "메모 없음"}</p></div></div>`;
-            } else { content.innerHTML = "<p style='text-align:center;'>기록이 없습니다.</p>"; }
-        } catch (e) { content.innerHTML = "<p style='text-align:center; color:red;'>조회 실패</p>"; }
+    window.onload = function() {
+        editorInstance = SUNEDITOR.create('outsideEditor', {
+            buttonList: [['undo', 'redo'], ['font', 'fontSize', 'formatBlock'], ['bold', 'underline', 'italic', 'strike'], ['fontColor', 'hiliteColor'], ['removeFormat'], ['align', 'list', 'lineHeight'], ['table', 'link', 'image']],
+            width: '100%', height: '250px', placeholder: '상세 특이사항을 입력해주세요...'
+        });
+    };
+
+    document.getElementById("storeTypeSelect").addEventListener("change", function() {
+        const val = this.value;
+        const mainSteps = document.getElementById("mainSteps");
+        const outsideArea = document.getElementById("outsideArea");
+        const step5 = document.getElementById("step5Section");
+
+        if(val === "외부활동(미점검)") {
+            mainSteps.style.display = "none";
+            outsideArea.style.display = "block";
+        } else {
+            mainSteps.style.display = "block";
+            outsideArea.style.display = "none";
+            step5.style.display = (val === "영업점") ? "none" : "block";
+        }
+    });
+
+    function calcS2_1() {
+        const lastTotal = Number(document.getElementsByName('s2_1_last_total')[0].value) || 0;
+        const lastExt = Number(document.getElementsByName('s2_1_last_ext')[0].value) || 0;
+        const currTotal = Number(document.getElementsByName('s2_1_curr_total')[0].value) || 0;
+        const currExt = Number(document.getElementsByName('s2_1_curr_ext')[0].value) || 0;
+
+        const lastPure = lastTotal - lastExt;
+        const currPure = currTotal - currExt;
+
+        document.getElementById('s2_1_last_pure').innerText = lastPure.toLocaleString();
+        document.getElementById('s2_1_curr_pure').innerText = currPure.toLocaleString();
+
+        const diffTotal = currTotal - lastTotal;
+        const perTotal = lastTotal ? ((diffTotal/lastTotal)*100).toFixed(1) : 0;
+        document.getElementById('s2_1_diff_total').innerText = `${diffTotal.toLocaleString()}(${perTotal}%)`;
+
+        const diffPure = currPure - lastPure;
+        const perPure = lastPure ? ((diffPure/lastPure)*100).toFixed(1) : 0;
+        document.getElementById('s2_1_diff_pure').innerText = `${diffPure.toLocaleString()}(${perPure}%)`;
     }
 
-    function closeHistory() { document.getElementById('historyModal').style.display = "none"; }
+    document.getElementById("blockSelector").addEventListener("change", function() {
+        const val = this.value;
+        if(!val) return;
+        const container = document.getElementById("blockTableContainer");
+        const tableId = `block_table_${val}`;
+        if(document.getElementById(tableId)) { alert("이미 추가된 블럭입니다."); return; }
 
-    async function saveToDataCenter() {
-        const form = document.getElementById('inspectionForm');
-        const formData = new FormData(form);
-        const branch = formData.get('branch_name');
-        const sc = formData.get('sc_name');
-        const store = formData.get('inspection_store_name');
-        const date = formData.get('inspection_date');
+        const tableHtml = `
+            <div id="${tableId}" style="margin-bottom:20px; border:1px solid #ddd; padding:15px; border-radius:10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+                <div style="display:flex; justify-content:space-between; margin-bottom:10px; align-items:center;">
+                    <strong style="color:var(--brand-green)">■ 블럭: ${val}</strong>
+                    <span style="cursor:pointer; color:red; font-size:12px;" onclick="this.parentElement.parentElement.remove()">❌ 삭제</span>
+                </div>
+                <table class="data-table">
+                    <tr><th>구분</th><th>전체매출</th><th>블럭매출</th><th>구성비(%)</th><th>증감율(%)</th></tr>
+                    <tr>
+                        <td>전년</td>
+                        <td><input type="number" id="block_lt_${val}" oninput="calcBlock('${val}')"></td>
+                        <td><input type="number" id="block_ls_${val}" oninput="calcBlock('${val}')"></td>
+                        <td id="block_lr_${val}" class="bg-gray">0%</td>
+                        <td rowspan="2" id="block_di_${val}" class="bg-gray">0%</td>
+                    </tr>
+                    <tr>
+                        <td>금년</td>
+                        <td><input type="number" id="block_ct_${val}" oninput="calcBlock('${val}')"></td>
+                        <td><input type="number" id="block_cs_${val}" oninput="calcBlock('${val}')"></td>
+                        <td id="block_cr_${val}" class="bg-gray">0%</td>
+                    </tr>
+                </table>
+            </div>`;
+        container.insertAdjacentHTML('beforeend', tableHtml);
+        this.value = "";
+    });
 
-        if (!branch || !sc || !store || !date) { alert("지점명, 담당SC, 점포명, 점검일자를 모두 입력해야 DB 저장이 가능합니다."); return; }
-        if(!confirm("구글 시트에 데이터를 저장하시겠습니까?")) return;
+    function calcBlock(val) {
+        const lt = Number(document.getElementById(`block_lt_${val}`).value) || 0;
+        const ls = Number(document.getElementById(`block_ls_${val}`).value) || 0;
+        const ct = Number(document.getElementById(`block_ct_${val}`).value) || 0;
+        const cs = Number(document.getElementById(`block_cs_${val}`).value) || 0;
 
-        const data = { action: "save", store, date, branch, sc, type: formData.get('store_type'), memo: formData.get('s2_1_comment') };
-        try {
-            await fetch(webAppUrl, { method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
-            alert("저장 요청 완료");
-        } catch (e) { alert("저장 실패"); }
+        document.getElementById(`block_lr_${val}`).innerText = lt ? ((ls/lt)*100).toFixed(1) + '%' : '0%';
+        document.getElementById(`block_cr_${val}`).innerText = ct ? ((cs/ct)*100).toFixed(1) + '%' : '0%';
+        document.getElementById(`block_di_${val}`).innerText = ls ? (((cs-ls)/ls)*100).toFixed(1) + '%' : '0%';
+    }
+
+    let accCount = 0;
+    function addAccountTable() {
+        accCount++;
+        const container = document.getElementById("accountTableContainer");
+        const tableHtml = `
+            <div style="margin-bottom:20px; border:1px solid var(--brand-blue); padding:15px; border-radius:10px; background:#fff; box-shadow:0 4px 10px rgba(0,0,0,0.05);">
+                <div style="display:flex; justify-content:space-between; margin-bottom:10px; align-items:center;">
+                    <strong style="color:var(--brand-blue)">■ 계정과목 분석 (#${accCount})</strong>
+                    <span style="cursor:pointer; font-size:12px; border:1px solid #ff0000; padding:2px 6px; border-radius:4px; color:#ff0000;" onclick="this.parentElement.parentElement.remove()">항목삭제</span>
+                </div>
+                <table class="data-table">
+                    <tr><th>계정과목 선택</th><th>전년실적</th><th>금년실적</th><th>증감율(%)</th></tr>
+                    <tr>
+                        <td>
+                            <select name="s3_acc_type_${accCount}" style="padding:4px; font-size:12px; border:1px solid #ddd; width:100%">
+                                <option>원가</option><option>인건비(메이트)</option><option>인건비(퇴직금)</option>
+                                <option>복리후생비</option><option>수선유지비</option><option>직배송물류비</option>
+                                <option>수도광열비</option><option>소모품비</option>
+                            </select>
+                        </td>
+                        <td><input type="number" id="s3_last_${accCount}" oninput="calcS3(${accCount})" style="width:90%"></td>
+                        <td><input type="number" id="s3_curr_${accCount}" oninput="calcS3(${accCount})" style="width:90%"></td>
+                        <td id="s3_res_${accCount}" class="bg-gray">0%</td>
+                    </tr>
+                </table>
+                <textarea name="s3_comment_${accCount}" style="margin-top:5px; height:60px;" placeholder="분석 코멘트를 입력하세요"></textarea>
+            </div>`;
+        container.insertAdjacentHTML('beforeend', tableHtml);
+    }
+
+    function calcS3(idx) {
+        const last = Number(document.getElementById(`s3_last_${idx}`).value) || 0;
+        const curr = Number(document.getElementById(`s3_curr_${idx}`).value) || 0;
+        const res = last ? (((curr - last) / last) * 100).toFixed(1) : 0;
+        document.getElementById(`s3_res_${idx}`).innerText = res + '%';
+    }
+
+    function calcS4_1() {
+        const last = Number(document.getElementsByName('s4_1_last_cost')[0].value) || 0;
+        const curr = Number(document.getElementsByName('s4_1_curr_cost')[0].value) || 0;
+        const res = last ? (((curr - last) / last) * 100).toFixed(1) : 0;
+        document.getElementById('s4_1_res').innerText = res + '%';
     }
 
     document.getElementById("branchSelect").addEventListener("change", function() {
         const scSelect = document.getElementById("scSelect");
-        scSelect.innerHTML = '<option value="">SC 선택</option>'; 
+        scSelect.innerHTML = '<option value="">SC 선택</option>'; 
         if (this.value && scList[this.value]) {
             scList[this.value].forEach(sc => { const option = document.createElement("option"); option.value = sc; option.textContent = sc; scSelect.appendChild(option); });
         }
     });
 
     document.getElementById("interview_check").addEventListener("change", function() { document.getElementById("interview_area").style.display = this.checked ? "block" : "none"; });
-    document.getElementById("storeTypeSelect").addEventListener("change", function() { document.getElementById("step5Section").style.display = (this.value === "영업점") ? "none" : "block"; });
+    function resetForm() { if(confirm("초기화 하시겠습니까?")) { location.reload(); } }
 
-    function resetForm() { if(confirm("초기화 하시겠습니까?")) { document.getElementById("inspectionForm").reset(); document.getElementById("interview_area").style.display = "none"; document.getElementById("step5Section").style.display = "block"; window.scrollTo(0,0); } }
-
-    async function getResizedImageData(file) {
-        return new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const img = new Image();
-                img.onload = function() {
-                    const canvas = document.createElement('canvas');
-                    let w = img.width, h = img.height, max = 600;
-                    if (w > max) { h *= max / w; w = max; }
-                    canvas.width = w; canvas.height = h;
-                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-                    resolve(canvas.toDataURL('image/jpeg', 0.7));
-                };
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        });
-    }
-
-    async function generateExcelFile() {
+    async function saveAsExcel() {
+        const workbook = new ExcelJS.Workbook();
+        const sheet = workbook.addWorksheet('Report');
         const form = document.getElementById('inspectionForm');
         const formData = new FormData(form);
         const branch = formData.get('branch_name') || "미선택";
         const sc = formData.get('sc_name') || "미선택";
         const storeName = formData.get('inspection_store_name') || "미입력";
-        const iDate = formData.get('inspection_date') || new Date().toLocaleDateString();
-        const fileName = `${branch}_${sc}_컨설팅리포트`;
+        const iDate = formData.get('inspection_date') || new Date().toISOString().split('T')[0];
+        
+        // 파일명 설정
+        const fileName = `${branch}_${sc}_컨설팅리포트(${iDate})`;
 
-        const workbook = new ExcelJS.Workbook();
-        const sheet = workbook.addWorksheet('컨설팅리포트');
+        // 스타일 정의
+        const headerStyle = { fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF00782B' } }, font: { color: { argb: 'FFFFFFFF' }, bold: true }, alignment: { horizontal: 'center' }, border: { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} } };
+        const labelStyle = { fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF7F3E8' } }, font: { bold: true }, border: { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} } };
+        const dataStyle = { border: { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} }, alignment: { wrapText: true, vertical: 'middle' } };
 
-        const headerStyle = { fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF00782B' } }, font: { color: { argb: 'FFFFFFFF' }, bold: true, size: 14 }, alignment: { horizontal: 'center', vertical: 'middle' } };
-        const labelStyle = { fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF0F7F2' } }, font: { bold: true, color: { argb: 'FF00782B' } }, border: { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }, alignment: { vertical: 'middle', horizontal: 'center' } };
-        const contentStyle = { border: { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }, alignment: { vertical: 'middle', wrapText: true } };
-
-        sheet.columns = [{ width: 25 }, { width: 50 }, { width: 30 }];
+        sheet.columns = [{ width: 25 }, { width: 40 }, { width: 25 }, { width: 40 }];
 
         // 타이틀
-        sheet.mergeCells('A1:C1');
-        const title = sheet.getCell('A1');
-        title.value = 'CONSULTING REPORT';
-        title.style = headerStyle;
-        sheet.getRow(1).height = 35;
+        sheet.mergeCells('A1:D1');
+        const titleCell = sheet.getCell('A1');
+        titleCell.value = 'STORE MANAGEMENT CONSULTING REPORT';
+        titleCell.style = headerStyle;
+        titleCell.font = { size: 14, color: { argb: 'FFFFFFFF' }, bold: true };
 
-        // 기본 정보
-        const info = [['점검일자', iDate], ['점포명', storeName], ['담당 SC', `${branch} / ${sc}`]];
-        info.forEach((row, idx) => {
-            const r = sheet.addRow([row[0], row[1], '']);
-            r.getCell(1).style = labelStyle;
-            r.getCell(2).style = contentStyle;
-            r.getCell(3).style = contentStyle;
+        // 기본정보
+        const infoRows = [
+            ['점검점포', storeName, '점검일자', iDate],
+            ['담당지점', branch, '담당SC', sc],
+            ['점포유형', formData.get('store_type'), '', '']
+        ];
+        infoRows.forEach(r => {
+            const row = sheet.addRow(r);
+            row.getCell(1).style = labelStyle; row.getCell(2).style = dataStyle;
+            row.getCell(3).style = labelStyle; row.getCell(4).style = dataStyle;
         });
 
-        // 데이터 섹션 함수
-        const addSection = (title) => {
-            const row = sheet.addRow([title]);
-            sheet.mergeCells(`A${row.number}:C${row.number}`);
-            row.getCell(1).style = headerStyle;
-            row.height = 25;
-        };
+        if(formData.get('store_type') === "외부활동(미점검)") {
+            sheet.addRow([]);
+            const outTitle = sheet.addRow(['■ 외부활동 특이사항']);
+            outTitle.getCell(1).style = headerStyle;
+            const content = sheet.addRow([editorInstance.getText()]);
+            sheet.mergeCells(`A${content.number}:D${content.number + 5}`);
+            content.getCell(1).style = dataStyle;
+        } else {
+            // Step 1
+            sheet.addRow([]);
+            const s1Header = sheet.addRow(['■ Step 1. 시설 및 환경 점검']);
+            sheet.mergeCells(`A${s1Header.number}:D${s1Header.number}`);
+            s1Header.getCell(1).style = headerStyle;
+            sheet.addRow(['항목', '점수/내용', '', '']);
+            sheet.addRow(['점포 외관', formData.get('s1_1_score') + '점']);
+            sheet.addRow(['점포 내부', formData.get('s1_2_score') + '점']);
+            sheet.addRow(['고지물 점검', formData.get('s1_3_score') + '점 / ' + formData.get('s1_3_add_comment')]);
 
-        const addData = async (label, value, camId, fileId) => {
-            const row = sheet.addRow([label, value || '-', '']);
-            row.getCell(1).style = labelStyle;
-            row.getCell(2).style = contentStyle;
-            row.getCell(3).style = contentStyle;
-            row.height = 90;
+            // Step 2-1 매출
+            sheet.addRow([]);
+            const s2Header = sheet.addRow(['■ Step 2. 매출 및 실적 분석']);
+            sheet.mergeCells(`A${s2Header.number}:D${s2Header.number}`);
+            s2Header.getCell(1).style = headerStyle;
+            sheet.addRow(['구분', '총매출', '외부채널', '순수내점']);
+            sheet.addRow(['전년', formData.get('s2_1_last_total'), formData.get('s2_1_last_ext'), document.getElementById('s2_1_last_pure').innerText]);
+            sheet.addRow(['금년', formData.get('s2_1_curr_total'), formData.get('s2_1_curr_ext'), document.getElementById('s2_1_curr_pure').innerText]);
+            sheet.addRow(['증감', document.getElementById('s2_1_diff_total').innerText, '', document.getElementById('s2_1_diff_pure').innerText]);
 
-            const file = (camId && document.getElementById(camId)?.files[0]) || (fileId && document.getElementById(fileId)?.files[0]);
-            if (file) {
-                const base64 = await getResizedImageData(file);
-                const imageId = workbook.addImage({ base64, extension: 'jpeg' });
-                sheet.addImage(imageId, { tl: { col: 2.1, row: row.number - 0.95 }, ext: { width: 180, height: 110 } });
-            }
-        };
+            // Step 2-2 블럭별 매출 (동적 테이블 순회)
+            document.querySelectorAll('[id^="block_table_"]').forEach(div => {
+                const blockName = div.querySelector('strong').innerText;
+                const rows = div.querySelectorAll('tr');
+                sheet.addRow([]);
+                sheet.addRow([blockName]);
+                sheet.addRow(['구분', '전체매출', '블럭매출', '구성비']);
+                const lastRow = rows[1].cells;
+                sheet.addRow(['전년', lastRow[1].querySelector('input').value, lastRow[2].querySelector('input').value, lastRow[3].innerText]);
+                const currRow = rows[2].cells;
+                sheet.addRow(['금년', currRow[1].querySelector('input').value, currRow[2].querySelector('input').value, currRow[3].innerText]);
+            });
 
-        addSection('Step 1. 시설 및 환경 점검');
-        await addData('1. 점포 외관', formData.get('s1_1_score') + '점', 'file_s1_1_cam', 'file_s1_1_file');
-        await addData('2. 점포 내부', formData.get('s1_2_score') + '점', 'file_s1_2_cam', 'file_s1_2_file');
-        await addData('3. 고지물 점검', formData.get('s1_3_score') + '점', 'file_s1_3_cam', 'file_s1_3_file');
-        await addData('4. 기기 고장 점검', formData.get('s1_4_score') + '점', 'file_s1_4_cam', 'file_s1_4_file');
+            // Step 3 손익 (동적 테이블 순회)
+            sheet.addRow([]);
+            const s3Header = sheet.addRow(['■ Step 3. 손익 분석 (계정과목별)']);
+            s3Header.getCell(1).style = headerStyle;
+            document.querySelectorAll('#accountTableContainer > div').forEach(div => {
+                const accName = div.querySelector('select').value;
+                const last = div.querySelector('[id^="s3_last_"]').value;
+                const curr = div.querySelector('[id^="s3_curr_"]').value;
+                const growth = div.querySelector('[id^="s3_res_"]').innerText;
+                const memo = div.querySelector('textarea').value;
+                sheet.addRow([accName, '전년:'+last, '금년:'+curr, '증감:'+growth]);
+                sheet.addRow(['분석내용', memo]);
+            });
 
-        addSection('Step 2. 매출 관련');
-        await addData('1. 목표 및 실적', formData.get('s2_1_comment'));
-        await addData('2. 신제품 분석', `비율: ${formData.get('s2_2_ratio')}% / 증감: ${formData.get('s2_2_increase')}% \n내용: ${formData.get('s2_2_comment')}`);
-        await addData('3. 품절 및 발주', formData.get('s2_3_comment'));
-        await addData('4. 폐기 및 배달', `폐기: ${formData.get('s2_4_waste')}% / 시간: ${formData.get('s2_4_time')} \n내용: ${formData.get('s2_4_comment')}`);
-        await addData('5. 판촉 운영', formData.get('s2_5_comment'));
+            // Step 4 인건비
+            sheet.addRow([]);
+            const s4Header = sheet.addRow(['■ Step 4. 인사 점검']);
+            s4Header.getCell(1).style = headerStyle;
+            sheet.addRow(['구분', '인건비(천원)', '사용시간', '증감율']);
+            sheet.addRow(['전년', formData.get('s4_1_last_cost'), formData.get('s4_1_last_time'), '']);
+            sheet.addRow(['금년', formData.get('s4_1_curr_cost'), formData.get('s4_1_curr_time'), document.getElementById('s4_1_res').innerText]);
 
-        addSection('Step 3. 손익 관련');
-        await addData('1. 부진점 운영', formData.get('s3_1_comment'));
-        await addData('2. 손익 분석', formData.get('s3_2_comment'));
-        await addData('3. 개선 방안', formData.get('s3_3_comment'));
-
-        addSection('Step 4. 인사 및 기타');
-        await addData('1. 인력 운영', `연장근무: ${formData.get('s4_overtime')} \n내용: ${formData.get('s4_1_comment')}`);
-        await addData('2. 직원 면담', `면담: ${formData.get('s4_interview_yn') === 'on' ? '실시' : '미실시'} \n주6일발생: ${formData.get('s4_work6days')} \n내용: ${formData.get('s4_2_comment')}`, 'file_interview_cam', 'file_interview_file');
-        await addData('3. 업무 특이사항', formData.get('s4_3_special_comment'));
-        await addData('4. 지적사항 개선', `확인: ${formData.get('s4_improvement_yn') === 'on' ? '완료' : '미완료'} \n내용: ${formData.get('s4_4_improvement_comment')}`);
-
-        if (formData.get('store_type') !== "영업점") {
-            addSection('Step 5. 생산형 점포');
-            await addData('1. 수율 및 인건비', `믹스: ${formData.get('s5_yield_mix')}% / 6X: ${formData.get('s5_yield_6x')}% / 정백당: ${formData.get('s5_yield_sugar')}% / 인건비: ${formData.get('s5_labor_cost')}원 \n내용: ${formData.get('s5_1_comment')}`);
-            await addData('2. 기기 상태', formData.get('s5_2_comment'), 'file_s5_machine_cam', 'file_s5_machine_file');
-            await addData('3. HACCP 서류', `확인: ${formData.get('haccp_yn') === 'on' ? '완료' : '미완료'} \n내용: ${formData.get('s5_3_comment')}`);
-            await addData('4. 고충 및 건의', formData.get('s5_4_suggestion'));
+            // Step 5 수율
+            sheet.addRow([]);
+            const s5Header = sheet.addRow(['■ Step 5. 생산 점포 수율']);
+            s5Header.getCell(1).style = headerStyle;
+            sheet.addRow(['믹스 수율', formData.get('s5_yield_mix') + '%', '개당 인건비', formData.get('s5_labor_cost') + '원']);
         }
 
+        // 전체 테두리 적용
+        sheet.eachRow(row => {
+            row.eachCell(cell => {
+                cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
+                if (typeof cell.value === 'number') cell.numFmt = '#,##0';
+            });
+        });
+
         const buffer = await workbook.xlsx.writeBuffer();
-        return { blob: new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), fileName };
+        saveAs(new Blob([buffer]), `${fileName}.xlsx`);
     }
 
-    async function saveAsExcel() { try { const { blob, fileName } = await generateExcelFile(); saveAs(blob, `${fileName}.xlsx`); } catch (e) { alert("저장 실패"); } }
-
-    async function sendEmail() {
-        const branch = document.getElementById("branchSelect").value;
-        const sc = document.getElementById("scSelect").value;
-        if(!branch || !sc) { alert("지점과 SC를 먼저 선택해 주세요."); return; }
-        const { blob, fileName } = await generateExcelFile(); saveAs(blob, `${fileName}.xlsx`);
-        const subject = `[제출] ${fileName}`;
-        window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=첨부파일 확인 바랍니다.`;
-    }
+    function openHistory() { alert("기록 조회 기능"); }
+    function saveToDataCenter() { alert("DB 저장 기능"); }
+    function sendEmail() { saveAsExcel(); }
 </script>
 
 </body>
